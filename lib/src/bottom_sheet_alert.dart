@@ -30,9 +30,10 @@ Future<T> showAdaptiveActionSheet<T>(
     barrierColor != Colors.transparent,
     'The barrier color cannot be transparent.',
   );
-
+  final BottomSheetThemeData sheetTheme = Theme.of(context).bottomSheetTheme;
+  final _bottomSheetColor = bottomSheetColor ?? sheetTheme.backgroundColor;
   return _show<T>(context, title, actions, cancelAction, barrierColor,
-      bottomSheetColor, itemTextColor);
+      _bottomSheetColor, itemTextColor);
 }
 
 Future<T> _show<T>(
@@ -128,15 +129,12 @@ Future<T> _showMaterialBottomSheet<T>(
   Color itemTextColor,
 ) {
   final defaultTextStyle = Theme.of(context).textTheme.headline6;
-  final BottomSheetThemeData sheetTheme = Theme.of(context).bottomSheetTheme;
 
   return showModalBottomSheet<T>(
     context: context,
     elevation: 0,
     isScrollControlled: true,
-    backgroundColor: bottomSheetColor ??
-        sheetTheme?.modalBackgroundColor ??
-        sheetTheme?.backgroundColor,
+    backgroundColor: bottomSheetColor,
     barrierColor: barrierColor,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.only(
