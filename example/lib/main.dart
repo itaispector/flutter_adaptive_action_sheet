@@ -41,6 +41,8 @@ class _MyHomePageState extends State<MyHomePage> {
             RaisedButton(
               onPressed: () {
                 showAdaptiveActionSheet(
+                  bottomSheetColor: Colors.black54,
+                  itemTextColor: Colors.white,
                   context: context,
                   actions: <BottomSheetAction>[
                     BottomSheetAction(

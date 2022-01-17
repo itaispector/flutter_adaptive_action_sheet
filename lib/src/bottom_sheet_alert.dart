@@ -16,14 +16,14 @@ import 'cancel_action.dart';
 ///
 /// The optional [backgroundColor] and [barrierColor] can be passed in to
 /// customize the appearance and behavior of persistent bottom sheets.
-Future<T> showAdaptiveActionSheet<T>({
-  @required BuildContext context,
-  Widget title,
-  @required List<BottomSheetAction> actions,
-  CancelAction cancelAction,
-  Color barrierColor,
-  Color bottomSheetColor,
-}) async {
+Future<T> showAdaptiveActionSheet<T>(
+    {@required BuildContext context,
+    Widget title,
+    @required List<BottomSheetAction> actions,
+    CancelAction cancelAction,
+    Color barrierColor,
+    Color bottomSheetColor,
+    Color itemTextColor}) async {
   assert(context != null);
   assert(actions != null);
   assert(
@@ -31,49 +31,34 @@ Future<T> showAdaptiveActionSheet<T>({
     'The barrier color cannot be transparent.',
   );
 
-  return _show<T>(
-    context,
-    title,
-    actions,
-    cancelAction,
-    barrierColor,
-    bottomSheetColor,
-  );
+  return _show<T>(context, title, actions, cancelAction, barrierColor,
+      bottomSheetColor, itemTextColor);
 }
 
 Future<T> _show<T>(
-  BuildContext context,
-  Widget title,
-  List<BottomSheetAction> actions,
-  CancelAction cancelAction,
-  Color barrierColor,
-  Color bottomSheetColor,
-) {
+    BuildContext context,
+    Widget title,
+    List<BottomSheetAction> actions,
+    CancelAction cancelAction,
+    Color barrierColor,
+    Color bottomSheetColor,
+    Color itemTextColor) {
   if (Platform.isIOS) {
     return _showCupertinoBottomSheet(
-      context,
-      title,
-      actions,
-      cancelAction,
-    );
+        context, title, actions, cancelAction, bottomSheetColor, itemTextColor);
   } else {
-    return _showMaterialBottomSheet(
-      context,
-      title,
-      actions,
-      cancelAction,
-      barrierColor,
-      bottomSheetColor,
-    );
+    return _showMaterialBottomSheet(context, title, actions, cancelAction,
+        barrierColor, bottomSheetColor, itemTextColor);
   }
 }
 
 Future<T> _showCupertinoBottomSheet<T>(
-  BuildContext context,
-  Widget title,
-  List<BottomSheetAction> actions,
-  CancelAction cancelAction,
-) {
+    BuildContext context,
+    Widget title,
+    List<BottomSheetAction> actions,
+    CancelAction cancelAction,
+    Color bottomSheetColor,
+    Color itemTextColor) {
   final defaultTextStyle = Theme.of(context).textTheme.headline6;
   return showCupertinoModalPopup(
     context: context,
@@ -86,7 +71,7 @@ Future<T> _showCupertinoBottomSheet<T>(
           /// so need to provide one in case trailing or
           /// leading widget require a Material widget ancestor.
           return Material(
-            color: Colors.transparent,
+            color: bottomSheetColor ?? Colors.transparent,
             child: CupertinoActionSheetAction(
               onPressed: action.onPressed,
               child: Row(
@@ -97,7 +82,7 @@ Future<T> _showCupertinoBottomSheet<T>(
                   ],
                   Expanded(
                     child: DefaultTextStyle(
-                      style: defaultTextStyle,
+                      style: defaultTextStyle.copyWith(color: itemTextColor),
                       textAlign: action.leading != null
                           ? TextAlign.start
                           : TextAlign.center,
@@ -114,13 +99,17 @@ Future<T> _showCupertinoBottomSheet<T>(
           );
         }).toList(),
         cancelButton: cancelAction != null
-            ? CupertinoActionSheetAction(
-                onPressed:
-                    cancelAction.onPressed ?? () => Navigator.of(coxt).pop(),
-                child: DefaultTextStyle(
-                  style: defaultTextStyle.copyWith(color: Colors.lightBlue),
-                  textAlign: TextAlign.center,
-                  child: cancelAction.title,
+            ? Material(
+                color: bottomSheetColor?.withAlpha(200) ?? Colors.white,
+                borderRadius: const BorderRadius.all(Radius.circular(8)),
+                child: CupertinoActionSheetAction(
+                  onPressed:
+                      cancelAction.onPressed ?? () => Navigator.of(coxt).pop(),
+                  child: DefaultTextStyle(
+                    style: defaultTextStyle.copyWith(color: Colors.lightBlue),
+                    textAlign: TextAlign.center,
+                    child: cancelAction.title,
+                  ),
                 ),
               )
             : null,
@@ -136,6 +125,7 @@ Future<T> _showMaterialBottomSheet<T>(
   CancelAction cancelAction,
   Color barrierColor,
   Color bottomSheetColor,
+  Color itemTextColor,
 ) {
   final defaultTextStyle = Theme.of(context).textTheme.headline6;
   final BottomSheetThemeData sheetTheme = Theme.of(context).bottomSheetTheme;
@@ -184,7 +174,8 @@ Future<T> _showMaterialBottomSheet<T>(
                         ],
                         Expanded(
                           child: DefaultTextStyle(
-                            style: defaultTextStyle,
+                            style:
+                                defaultTextStyle.copyWith(color: itemTextColor),
                             textAlign: action.leading != null
                                 ? TextAlign.start
                                 : TextAlign.center,
